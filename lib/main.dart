@@ -74,43 +74,46 @@ class _HomePageState extends State<HomePage> {
               controller: _titleCtrl,
               decoration: const InputDecoration(hintText: 'Title'),
             ),
-            const SizedBox(height:10),
+            const SizedBox(height: 10),
             TextField(
               controller: _descriptionCtrl,
               decoration: const InputDecoration(hintText: 'Description'),
             ),
-            const SizedBox(height:20),
-            ElevatedButton(onPressed: (){
-              if (id == null) {
-                await _addItem();
-              } else {
-                await _updateItem(id);
-              }
+            const SizedBox(height: 20),
+            ElevatedButton(
+                onPressed: () async {
+                  if (id == null) {
+                    await _addItem();
+                  } else {
+                    await _updateItem(id);
+                  }
 
-              _titleCtrl.text = '';
-              _descriptionCtrl.text = '';
+                  _titleCtrl.text = '';
+                  _descriptionCtrl.text = '';
 
-              Navigator.of(context).pop();
-            }, child: Text(id==null? 'Create New': 'Update'))
+                  Navigator.of(context).pop();
+                },
+                child: Text(id == null ? 'Create New' : 'Update'))
           ],
         ),
       ),
     );
   }
 
-  Future<void> _addItem() async{
+  Future<void> _addItem() async {
     await SQLHelper.createItem(_titleCtrl.text, _descriptionCtrl.text);
     _refreshJournals();
   }
 
-  Future<void> _updateItem(int id) async{
+  Future<void> _updateItem(int id) async {
     await SQLHelper.updateItem(id, _titleCtrl.text, _descriptionCtrl.text);
     _refreshJournals();
   }
 
-  Future<void> _deleteItem(int id) async{
+  Future<void> _deleteItem(int id) async {
     await SQLHelper.deleteItem(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Successfully deleted an entry!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully deleted an entry!')));
     _refreshJournals();
   }
 
@@ -120,35 +123,35 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Simple Notes'),
       ),
-      body: _isLoading ? const
-      Center(
-        child: CircularProgressIndicator(),
-      )
-      : ListView.builder(itemCount: _journals.length,
-        itemBuilder: (context, index) =>Card(
-          color: Colors.orange[200],
-          margin: const EdgeInsets.all(15),
-          child: ListTile(
-            title: Text(_journals[index]['title']),
-            subtitle: Text(_journals[index]['description']),
-            trailing: SizedBox(
-              width: 100,
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _showForm(_journals[index]['id'])
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: _journals.length,
+              itemBuilder: (context, index) => Card(
+                color: Colors.teal[200],
+                margin: const EdgeInsets.all(15),
+                child: ListTile(
+                  title: Text(_journals[index]['title']),
+                  subtitle: Text(_journals[index]['description']),
+                  trailing: SizedBox(
+                    width: 100,
+                    child: Row(
+                      children: [
+                        IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () => _showForm(_journals[index]['id'])),
+                        IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () =>
+                                _deleteItem(_journals[index]['id'])),
+                      ],
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteItem(_journals[index]['id'])
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
